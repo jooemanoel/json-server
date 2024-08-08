@@ -1,9 +1,28 @@
 {
-  "posts": [
-    { "id": 1, "title": "json-server", "author": "typicode" }
-  ],
-  "comments": [
-    { "id": 1, "body": "some comment", "postId": 1 }
-  ],
-  "profile": { "name": "typicode" }
+  "lista": [
+    {
+      "nome": "Joao",
+      "qt": 0,
+      "md": "un",
+      "id": 1
+    },
+    {
+      "nome": "Joao",
+      "qt": 0,
+      "md": "un",
+      "id": 2
+    },
+    {
+      "nome": "Arroz",
+      "qt": 0,
+      "md": "un",
+      "id": 3
+    },
+    {
+      "nome": "asdf",
+      "qt": 0,
+      "md": "un",
+      "id": 4
+    }
+  ]
 }
