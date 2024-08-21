@@ -1,16 +1,10 @@
 {
   "lista": [
     {
-      "nome": "Joao",
-      "qt": 0,
-      "md": "un",
-      "id": 1
-    },
-    {
       "nome": "Arroz",
       "qt": 0,
       "md": "un",
-      "id": 2
+      "id": 1
     }
   ]
 }
