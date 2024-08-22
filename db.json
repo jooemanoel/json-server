@@ -1,16 +1,23 @@
 {
+  "lembretes": [],
   "lista": [
     {
       "nome": "Feijão",
-      "qt": 0,
+      "qt": 5,
       "md": "un",
       "id": 2
     },
     {
       "nome": "Milho",
-      "qt": 0,
+      "qt": 6,
       "md": "un",
       "id": 3
+    },
+    {
+      "nome": "Arroz",
+      "qt": 4,
+      "md": "un",
+      "id": 4
     }
   ]
 }
