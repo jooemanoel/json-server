@@ -32,7 +32,7 @@ const options = {
 const swaggerSpec = swaggerJsdoc(options);
 
 // Rota do Swagger UI
-app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 async function authorize() {
   const auth = new google.auth.GoogleAuth({
