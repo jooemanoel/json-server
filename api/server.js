@@ -1,6 +1,8 @@
 const express = require("express");
 const { google } = require("googleapis");
 const dotenv = require("dotenv");
+const swaggerUi = require("swagger-ui-express");
+const swaggerJsdoc = require("swagger-jsdoc");
 
 dotenv.config();
 
@@ -12,6 +14,26 @@ app.use(express.json()); // Para receber JSON no body das requisições
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID;
 const CREDENTIALS = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 
+// Definindo a configuração do Swagger
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "API Google Sheets",
+      version: "1.0.0",
+      description:
+        "API para ler e escrever dados em uma planilha do Google Sheets",
+    },
+  },
+  apis: ["./api/server.js"], // O caminho para o arquivo com as rotas
+};
+
+// Gerando a especificação Swagger
+const swaggerSpec = swaggerJsdoc(options);
+
+// Rota do Swagger UI
+app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 async function authorize() {
   const auth = new google.auth.GoogleAuth({
     credentials: CREDENTIALS,
@@ -20,7 +42,28 @@ async function authorize() {
   return auth.getClient();
 }
 
-// Rota GET para ler dados da planilha
+/**
+ * @swagger
+ * /read:
+ *   get:
+ *     summary: "Ler dados de uma planilha do Google Sheets"
+ *     responses:
+ *       200:
+ *         description: "Dados lidos com sucesso"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *       500:
+ *         description: "Erro ao ler os dados"
+ */
 app.get("/read", async (req, res) => {
   try {
     const auth = await authorize();
@@ -37,7 +80,32 @@ app.get("/read", async (req, res) => {
   }
 });
 
-// Rota POST para escrever na planilha
+/**
+ * @swagger
+ * /write:
+ *   post:
+ *     summary: "Escrever dados em uma planilha do Google Sheets"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               values:
+ *                 type: array
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *     responses:
+ *       200:
+ *         description: "Dados escritos com sucesso"
+ *       400:
+ *         description: "Erro no corpo da requisição"
+ *       500:
+ *         description: "Erro ao escrever os dados"
+ */
 app.post("/write", async (req, res) => {
   try {
     const { values } = req.body; // Exemplo: { "values": [["Dado1", "Dado2"]] }
