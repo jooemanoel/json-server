@@ -1,34 +1,71 @@
-// See https://github.com/typicode/json-server#module
-import pkg from "json-server";
-const { create, router: _router, defaults, rewriter } = pkg;
+const express = require("express");
+const { google } = require("googleapis");
+const fs = require("fs");
+const dotenv = require("dotenv");
 
-const server = create();
+dotenv.config();
 
-// Uncomment to allow write operations
-import { readFileSync } from "fs";
-import { join } from "path";
-const filePath = join("db.json");
-const data = readFileSync(filePath, "utf-8");
-const db = JSON.parse(data);
-const router = _router(db);
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Comment out to allow write operations
-// const router = jsonServer.router('db.json')
+app.use(express.json()); // Para receber JSON no body das requisições
 
-const middlewares = defaults();
+const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID;
+const CREDENTIALS = JSON.parse(fs.readFileSync(process.env.GOOGLE_CREDENTIALS));
 
-server.use(middlewares);
-// Add this before server.use(router)
-server.use(
-  rewriter({
-    "/api/*": "/$1",
-    "/blog/:resource/:id/show": "/:resource/:id",
-  })
-);
-server.use(router);
-server.listen(3000, () => {
-  console.log("JSON Server is running");
+async function authorize() {
+  const auth = new google.auth.GoogleAuth({
+    credentials: CREDENTIALS,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+  return auth.getClient();
+}
+
+// Rota GET para ler dados da planilha
+app.get("/read", async (req, res) => {
+  try {
+    const auth = await authorize();
+    const sheets = google.sheets({ version: "v4", auth });
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: "A1:D10", // Altere para o intervalo desejado
+    });
+
+    res.json({ data: response.data.values });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-// Export the Server API
-export default server;
+// Rota POST para escrever na planilha
+app.post("/write", async (req, res) => {
+  try {
+    const { values } = req.body; // Exemplo: { "values": [["Dado1", "Dado2"]] }
+
+    if (!values || !Array.isArray(values)) {
+      return res.status(400).json({
+        error: "O corpo da requisição deve conter um array chamado 'values'",
+      });
+    }
+
+    const auth = await authorize();
+    const sheets = google.sheets({ version: "v4", auth });
+
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: SPREADSHEET_ID,
+      range: "A2",
+      valueInputOption: "RAW",
+      resource: { values },
+    });
+
+    res.json({ message: "Dados escritos com sucesso!" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Inicia o servidor
+app.listen(PORT, () => {
+  console.log(`API rodando em http://localhost:${PORT}`);
+});
