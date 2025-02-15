@@ -1,6 +1,5 @@
 const express = require("express");
 const { google } = require("googleapis");
-const fs = require("fs");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -11,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json()); // Para receber JSON no body das requisições
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID;
-const CREDENTIALS = JSON.parse(fs.readFileSync(process.env.GOOGLE_CREDENTIALS));
+const CREDENTIALS = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 
 async function authorize() {
   const auth = new google.auth.GoogleAuth({
