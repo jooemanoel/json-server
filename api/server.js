@@ -10,6 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json()); // Para receber JSON no body das requisições
+app.use("/swagger-ui", express.static("node_modules/swagger-ui-dist"));
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID;
 const CREDENTIALS = JSON.parse(process.env.GOOGLE_CREDENTIALS);
