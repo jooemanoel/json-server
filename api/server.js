@@ -134,12 +134,28 @@ app.post("/write", async (req, res) => {
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
-      range: "A2",
+      range: "A1",
       valueInputOption: "RAW",
       resource: { values },
     });
 
     res.json({ message: "Dados escritos com sucesso!" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/clear", async (req, res) => {
+  try {
+    const auth = await authorize();
+    const sheets = google.sheets({ version: "v4", auth });
+
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId: SPREADSHEET_ID,
+      range: "A:D", // Limpa todas as colunas usadas
+    });
+
+    res.json({ message: "Planilha limpa com sucesso!" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
