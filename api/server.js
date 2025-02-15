@@ -64,6 +64,17 @@ async function authorize() {
  *       500:
  *         description: "Erro ao ler os dados"
  */
+app.get("/", async (req, res) => {
+  try {
+    res.send(`
+      <h1>API em Funcionamento!</h1>
+      <a href="/api-docs">Swagger</a>
+      `);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get("/read", async (req, res) => {
   try {
     const auth = await authorize();

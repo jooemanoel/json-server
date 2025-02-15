@@ -8,6 +8,10 @@
     {
       "source": "/(.*)",
       "destination": "api/server.js"
+    },
+    {
+      "source": "/api-docs",
+      "destination": "/api/server.js"
     }
   ]
 }
