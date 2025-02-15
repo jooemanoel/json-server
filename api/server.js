@@ -1,31 +1,53 @@
-// See https://github.com/typicode/json-server#module
-const jsonServer = require('json-server')
+import { createServer } from "http";
 
-const server = jsonServer.create()
+const port = 3000;
 
-// Uncomment to allow write operations
-const fs = require('fs')
-const path = require('path')
-const filePath = path.join('db.json')
-const data = fs.readFileSync(filePath, "utf-8");
-const db = JSON.parse(data);
-const router = jsonServer.router(db)
+const server = createServer((req, res) => {
+  if (req.method === "GET" && req.url === "/") {
+    console.log("Acesso ao root");
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end(`
+      <h1>Oi!</h1>
+      <a href="./soma">Soma</a>
+    `);
+  } else if (req.method === "GET" && req.url === "/soma") {
+    console.log("Acesso a soma");
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end(`
+      <a href="../">Voltar</a>
+      <p>Use esta url para enviar a soma de dois numeros via POST</p>
+    `);
+  } else if (req.method === "POST" && req.url === "/soma") {
+    let body = "";
 
-// Comment out to allow write operations
-// const router = jsonServer.router('db.json')
+    req.on("data", (chunk) => {
+      body += chunk.toString(); // Acumula os dados recebidos
+    });
 
-const middlewares = jsonServer.defaults()
+    req.on("end", () => {
+      try {
+        const { num1, num2 } = JSON.parse(body);
 
-server.use(middlewares)
-// Add this before server.use(router)
-server.use(jsonServer.rewriter({
-    '/api/*': '/$1',
-    '/blog/:resource/:id/show': '/:resource/:id'
-}))
-server.use(router)
-server.listen(3000, () => {
-    console.log('JSON Server is running')
-})
+        if (typeof num1 !== "number" || typeof num2 !== "number") {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Os valores devem ser números" }));
+          return;
+        }
 
-// Export the Server API
-module.exports = server
+        const resultado = num1 + num2;
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ resultado }));
+      } catch (error) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Erro ao processar JSON" }));
+      }
+    });
+  } else {
+    res.writeHead(404, { "Content-Type": "text/plain" });
+    res.end("Rota não encontrada");
+  }
+});
+
+server.listen(port, () => {
+  console.log(`Servidor rodando em http://localhost:${port}`);
+});
