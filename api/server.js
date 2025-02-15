@@ -10,7 +10,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json()); // Para receber JSON no body das requisições
-app.use("/swagger-ui", express.static("node_modules/swagger-ui-dist"));
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID;
 const CREDENTIALS = JSON.parse(process.env.GOOGLE_CREDENTIALS);
@@ -33,15 +32,7 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 // Rota do Swagger UI
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec, {
-    swaggerOptions: {
-      url: "/swagger.json", // Carregar a especificação diretamente
-    },
-  })
-);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 async function authorize() {
   const auth = new google.auth.GoogleAuth({
