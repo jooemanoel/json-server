@@ -15,7 +15,7 @@ const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID;
 const CREDENTIALS = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 
 // Definindo a configuração do Swagger
-const options = {
+const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
     info: {
@@ -29,10 +29,18 @@ const options = {
 };
 
 // Gerando a especificação Swagger
-const swaggerSpec = swaggerJsdoc(options);
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 // Rota do Swagger UI
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    swaggerOptions: {
+      url: "/swagger.json", // Carregar a especificação diretamente
+    },
+  })
+);
 
 async function authorize() {
   const auth = new google.auth.GoogleAuth({
