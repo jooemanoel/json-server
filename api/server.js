@@ -3,12 +3,14 @@ const { google } = require("googleapis");
 const dotenv = require("dotenv");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
+const cors = require("cors"); // Importação do middleware de CORS
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors()); // Habilita CORS para todas as origens
 app.use(express.json()); // Para receber JSON no body das requisições
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID;
